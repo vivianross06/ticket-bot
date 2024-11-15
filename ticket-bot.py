@@ -8,7 +8,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
-from py_imessage import imessage
 import mac_imessage
 
 import time
@@ -39,11 +38,10 @@ def main():
     # create webdriver object
     driver = webdriver.Chrome()
     driver.implicitly_wait(10)
-    continue_looping = True
 
     phone = "7326888057"
 
-    while continue_looping:
+    while True:
         for link in LINKS:
             try:
                 driver.get(link)
@@ -65,14 +63,12 @@ def main():
                 if check_element_exists_by_id(driver, "quickpicks-listings"):
                     print(f"TICKET FOUND FOR {link}")
                     mac_imessage.send(f"FOUND TICKET: {link}", phone, 'iMessage')
-                    # guid = imessage.send(phone, link)
                     ticket = driver.find_element(By.XPATH, "//*[@data-index='qp-0']")
                     ele = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@data-index='qp-0']")))
                     print(ticket)
                     ele.click()
                     playsound('./sounds/alarm_clock.mp3')
-                    # continue_looping=False
-                    break
+                    time.sleep(600)
             except Exception as e:
                 print(e)
                 playsound('./sounds/failure.wav')
