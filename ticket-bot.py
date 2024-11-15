@@ -42,9 +42,11 @@ def main():
         for link in LINKS:
             try:
                 driver.get(link)
+                # closes pop up notification
                 if check_element_exists_by_id(driver, "accept-and-continue-notification-text"):
                     button = driver.find_element(By.XPATH, "//button[@data-bdd='accept-modal-accept-button']")
                     button.click()
+                # filters by 2 tickets
                 if check_element_exists_by_id(driver, "filter-bar-quantity"):
                     select = Select(driver.find_element(By.ID, 'filter-bar-quantity'))
                     select.select_by_value('2')
