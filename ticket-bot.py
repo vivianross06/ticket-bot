@@ -14,10 +14,17 @@ import time
 
 def check_element_exists_by_id(driver, element):
     try:
-        driver.find_element(By.ID, element)
-        return True
+        ele = driver.find_element(By.ID, element)
+        return ele
     except NoSuchElementException:
-        return False
+        return None
+
+def check_element_exists_by_xpath(driver, element):
+    try:
+        ele = driver.find_element(By.XPATH, element)
+        return ele
+    except NoSuchElementException:
+        return None
 
 def check_for_sold_out_notification(driver):
     try:
@@ -48,8 +55,9 @@ def main():
                     button = driver.find_element(By.XPATH, "//button[@data-bdd='accept-modal-accept-button']")
                     button.click()
                 # filters by 2 tickets
-                if check_element_exists_by_id(driver, "filter-bar-quantity"):
-                    select = Select(driver.find_element(By.ID, 'filter-bar-quantity'))
+                ticket_count_filter = check_element_exists_by_id(driver, "filter-bar-quantity")
+                if ticket_count_filter:
+                    select = Select(ticket_count_filter)
                     select.select_by_value('2')
 
                 # Checks that tickets are not sold out-takes 20 seconds to notify, but confirmed to work
@@ -57,17 +65,18 @@ def main():
                 #     print(f"TICKET FOUND FOR {link}")
                 #     playsound('./sounds/found.wav')
 
-                # Checks if tickets are available - potentially faster but not tested
+                # Checks if tickets are available
                 if check_element_exists_by_id(driver, "quickpicks-listings"):
                     ticket = driver.find_element(By.XPATH, "//*[@data-index='qp-0']")
-                    ele = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@data-index='qp-0']")))
-                    ele.click()
-                    next_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@data-bdd='offer-card-buy-button']")))
-                    next_button.click()
-                    print(f"TICKET FOUND FOR {link}")
-                    mac_imessage.send(f"FOUND TICKET: {link}", PHONE, 'iMessage')
-                    playsound('./sounds/alarm_clock.mp3')
-                    time.sleep(600)
+                    ticket.click()
+                    next_button = check_element_exists_by_xpath(driver, "//button[@data-bdd='offer-card-buy-button']")
+                    if next_button:
+                        next_button.click()
+                        if check_element_exists_by_id(driver, "email[objectobject]__input"):
+                            print(f"TICKET FOUND FOR {link}")
+                            mac_imessage.send(f"FOUND TICKET: {link}", PHONE, 'iMessage')
+                            playsound('./sounds/found.wav')
+                            time.sleep(600)
             except Exception as e:
                 print(e)
                 playsound('./sounds/failure.wav')
