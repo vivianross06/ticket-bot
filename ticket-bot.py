@@ -1,4 +1,4 @@
-from links import LINKS
+from constants import LINKS, PHONE
 
 from playsound import playsound
 
@@ -39,8 +39,6 @@ def main():
     driver = webdriver.Chrome()
     driver.implicitly_wait(10)
 
-    phone = "7326888057"
-
     while True:
         for link in LINKS:
             try:
@@ -61,12 +59,13 @@ def main():
 
                 # Checks if tickets are available - potentially faster but not tested
                 if check_element_exists_by_id(driver, "quickpicks-listings"):
-                    print(f"TICKET FOUND FOR {link}")
-                    mac_imessage.send(f"FOUND TICKET: {link}", phone, 'iMessage')
                     ticket = driver.find_element(By.XPATH, "//*[@data-index='qp-0']")
                     ele = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//*[@data-index='qp-0']")))
-                    print(ticket)
                     ele.click()
+                    next_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@data-bdd='offer-card-buy-button']")))
+                    next_button.click()
+                    print(f"TICKET FOUND FOR {link}")
+                    mac_imessage.send(f"FOUND TICKET: {link}", PHONE, 'iMessage')
                     playsound('./sounds/alarm_clock.mp3')
                     time.sleep(600)
             except Exception as e:
