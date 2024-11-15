@@ -48,7 +48,14 @@ def main():
                 if check_element_exists_by_id(driver, "filter-bar-quantity"):
                     select = Select(driver.find_element(By.ID, 'filter-bar-quantity'))
                     select.select_by_value('2')
-                if not (check_for_sold_out_notification(driver) or check_for_no_matching(driver)):
+
+                # Checks that tickets are not sold out-takes 20 seconds to notify, but confirmed to work
+                # if not (check_for_sold_out_notification(driver) or check_for_no_matching(driver)):
+                #     print(f"TICKET FOUND FOR {link}")
+                #     playsound('./sounds/found.wav')
+
+                # Checks if tickets are available - potentially faster but not tested
+                if check_element_exists_by_id(driver, "quickpicks-listings"):
                     print(f"TICKET FOUND FOR {link}")
                     playsound('./sounds/found.wav')
             except Exception as e:
