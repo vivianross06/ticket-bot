@@ -51,8 +51,8 @@ def main():
             try:
                 driver.get(link)
                 # closes pop up notification
-                if check_element_exists_by_id(driver, "accept-and-continue-notification-text"):
-                    button = driver.find_element(By.XPATH, "//button[@data-bdd='accept-modal-accept-button']")
+                button = check_element_exists_by_xpath(driver, "//button[@data-bdd='accept-modal-accept-button']")
+                if button:
                     button.click()
                 # filters by 2 tickets
                 ticket_count_filter = check_element_exists_by_id(driver, "filter-bar-quantity")
@@ -66,17 +66,19 @@ def main():
                 #     playsound('./sounds/found.wav')
 
                 # Checks if tickets are available
-                if check_element_exists_by_id(driver, "quickpicks-listings"):
-                    ticket = driver.find_element(By.XPATH, "//*[@data-index='qp-0']")
+                ticket = check_element_exists_by_xpath(driver, "//*[@data-index='qp-0']")
+                if ticket:
                     ticket.click()
                     next_button = check_element_exists_by_xpath(driver, "//button[@data-bdd='offer-card-buy-button']")
                     if next_button:
                         next_button.click()
                         if check_element_exists_by_id(driver, "email[objectobject]__input"):
                             print(f"TICKET FOUND FOR {link}")
-                            mac_imessage.send(f"FOUND TICKET: {link}", PHONE, 'iMessage')
+                            # mac_imessage.send(f"FOUND TICKET: {link}", PHONE, 'iMessage')
                             playsound('./sounds/found.wav')
                             time.sleep(600)
+                        else:
+                            print(f"Tickets were available for {link}. But they're gone now :(")
             except Exception as e:
                 print(e)
                 playsound('./sounds/failure.wav')
