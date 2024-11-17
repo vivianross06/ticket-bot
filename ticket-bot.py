@@ -103,7 +103,7 @@ def main():
         time_diff = time_now-time_start
         if time_diff.seconds > 1800:
             log_in(driver)
-            time_now = datetime.now()
+            time_start = datetime.now()
         for link in LINKS:
             try:
                 driver.get(link)
