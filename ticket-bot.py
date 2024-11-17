@@ -116,12 +116,10 @@ def main():
                         if find_present_explicit_wait_xpath(driver, "//h1[@class='style__Title-sc-10x7mpm-21 kKixwu']", 10):
                             print(f"{datetime.now()} TICKET FOUND FOR {link}")
                             # mac_imessage.send(f"FOUND TICKET: {link}", PHONE, 'iMessage')
+                            playsound('./sounds/found.wav')
+                            time.sleep(600)
                         else:
-                            print(f"{datetime.now()} not sure if ticket was found for {link}")
-                        playsound('./sounds/found.wav')
-                        time.sleep(600)
-                        # else:
-                        #     print(f"{datetime.now()} Tickets were available for {link}. But they're gone now :(")
+                            print(f"{datetime.now()} Tickets were available for {link}. But they're gone now :(")
             except Exception as e:
                 print(e)
                 playsound('./sounds/failure.wav')
