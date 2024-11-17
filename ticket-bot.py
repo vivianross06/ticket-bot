@@ -1,4 +1,4 @@
-from constants import LINKS, PHONE
+from constants import LINKS, PHONE, SIGN_IN, EMAIL, PASSWORD
 
 from playsound import playsound
 
@@ -77,47 +77,51 @@ def main():
     driver = webdriver.Chrome()
     driver.implicitly_wait(0)
 
+    # logs in
+    try:
+        driver.get(SIGN_IN)
+        email = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "email[objectobject]__input")))
+        email.send_keys(EMAIL)
+        password = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "password[objectobject]__input")))
+        password.send_keys(PASSWORD)
+        sign_in_button = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.NAME, "sign-in")))
+        sign_in_button.click()
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@data-testid='accountLink']")))
+    except Exception as e:
+        print(e)
+        playsound('./sounds/failure.wav')
+
+
     while True:
         for link in LINKS:
             try:
                 driver.get(link)
                 # closes pop up notification
-                # button = check_element_exists_by_xpath(driver, "//button[@data-bdd='accept-modal-accept-button']")
                 button = find_clickable_explicit_wait_xpath(driver, "//button[@data-bdd='accept-modal-accept-button']", 5)
-                # button = find_clickable_explicit_wait_xpath(driver, "/html/body/div[2]/div/div[7]/div/div/div[3]/div/button", 5)
                 if button:
                     button.click()
                 # filters by 2 tickets
-                # ticket_count_filter = check_element_exists_by_id(driver, "filter-bar-quantity")
                 ticket_count_filter = find_clickable_explicit_wait_id(driver, "filter-bar-quantity", 5)
                 if ticket_count_filter:
                     select = Select(ticket_count_filter)
                     select.select_by_value('2')
 
-                # Checks that tickets are not sold out-takes 20 seconds to notify, but confirmed to work
-                # if not (check_for_sold_out_notification(driver) or check_for_no_matching(driver)):
-                #     print(f"TICKET FOUND FOR {link}")
-                #     playsound('./sounds/found.wav')
-
                 # Checks if tickets are available
-                # ticket = check_element_exists_by_xpath(driver, "//*[@data-index='qp-0']")
                 ticket = find_clickable_explicit_wait_xpath(driver, "//*[@data-index='qp-0']", 5)
                 if ticket:
                     ticket.click()
-                    # next_button = check_element_exists_by_xpath(driver, "//button[@data-bdd='offer-card-buy-button']")
                     next_button = find_clickable_explicit_wait_xpath(driver, "//button[@data-bdd='offer-card-buy-button']", 5)
                     if next_button:
                         next_button.click()
-                        # driver.implicitly_wait(10)
-                        # if check_element_exists_by_id(driver, "email[objectobject]__input"):
-                        if find_present_explicit_wait_id(driver, "email[objectobject]__input", 5):
-                            # driver.implicitly_wait(6)
+                        if find_present_explicit_wait_xpath(driver, "//h1[@class='style__Title-sc-10x7mpm-21 kKixwu']", 10):
                             print(f"{datetime.now()} TICKET FOUND FOR {link}")
                             # mac_imessage.send(f"FOUND TICKET: {link}", PHONE, 'iMessage')
-                            playsound('./sounds/found.wav')
-                            time.sleep(600)
                         else:
-                            print(f"{datetime.now()} Tickets were available for {link}. But they're gone now :(")
+                            print(f"{datetime.now()} not sure if ticket was found for {link}")
+                        playsound('./sounds/found.wav')
+                        time.sleep(600)
+                        # else:
+                        #     print(f"{datetime.now()} Tickets were available for {link}. But they're gone now :(")
             except Exception as e:
                 print(e)
                 playsound('./sounds/failure.wav')
