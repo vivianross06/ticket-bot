@@ -68,15 +68,8 @@ def find_present_explicit_wait_xpath(driver, xpath, duration):
         return element
     except TimeoutException:
         return None
-        
-
-def main():
-    # create webdriver object
-    options = webdriver.ChromeOptions()
-    options.page_load_strategy = 'none'
-    driver = webdriver.Chrome()
-    driver.implicitly_wait(0)
-
+    
+def log_in(driver):
     # logs in
     try:
         driver.get(SIGN_IN)
@@ -90,9 +83,27 @@ def main():
     except Exception as e:
         print(e)
         playsound('./sounds/failure.wav')
+        raise e
+
+def main():
+    # create webdriver object
+    options = webdriver.ChromeOptions()
+    options.page_load_strategy = 'none'
+    driver = webdriver.Chrome()
+    driver.implicitly_wait(0)
+
+    # logs in
+    log_in(driver)
+
+    time_start = datetime.now()
 
 
     while True:
+        time_now = datetime.now()
+        time_diff = time_now-time_start
+        if time_diff.seconds > 1800:
+            log_in(driver)
+            time_now = datetime.now()
         for link in LINKS:
             try:
                 driver.get(link)
