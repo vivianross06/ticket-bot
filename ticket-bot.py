@@ -70,10 +70,15 @@ def find_present_explicit_wait_xpath(driver, xpath, duration):
         return None
     
 def log_in(driver):
-    # logs in
+    # check if already logged in
     try:
         driver.get(SIGN_IN)
         email = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "email[objectobject]__input")))
+    except TimeoutException:
+        print("already logged in")
+        return
+    # logs in
+    try:
         email.send_keys(EMAIL)
         password = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "password[objectobject]__input")))
         password.send_keys(PASSWORD)
@@ -81,6 +86,7 @@ def log_in(driver):
         sign_in_button.click()
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//button[@data-testid='accountLink']")))
     except Exception as e:
+        print("error logging in")
         print(e)
         playsound('./sounds/failure.wav')
         raise e
@@ -102,7 +108,11 @@ def main():
         time_now = datetime.now()
         time_diff = time_now-time_start
         if time_diff.seconds > 1800:
-            log_in(driver)
+            if find_present_explicit_wait_xpath(driver, "//button[@data-bdd='identity-login-login-button']", 5):
+                print("reauntheticating")
+                log_in(driver)
+            else:
+                print("already logged in, no need to reauthenticate")
             time_start = datetime.now()
         for link in LINKS:
             try:
